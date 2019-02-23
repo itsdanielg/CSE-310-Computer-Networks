@@ -9,7 +9,7 @@ import csv
 # Create and start the server for the application
 def startServer():
 
-    # Create server socket; return false if creation fails
+    # Create server socket; Exit server if creation fails
     try:
         serverSocket = socket(AF_INET, SOCK_STREAM)
         print("SUCCESS: Server socket created!")
@@ -21,7 +21,7 @@ def startServer():
     serverHost = "127.0.0.1"
     serverPort = 8887
 
-    # Bind the server socket to the host
+    # Bind the server socket to the host; Exit server if bind fails
     try:
         serverSocket.bind((serverHost, serverPort))
     except error:
@@ -32,7 +32,7 @@ def startServer():
     serverSocket.listen(1)
     print("SUCCESS: Server created! Now listening for connections...")
 
-    # Send message to client once client connects
+    # Send message to client once client connects; Exit server if sending fails
     try:
         connectionSocket, connectionAddress = serverSocket.accept()
         print("SUCCESS: Connected to", connectionAddress, "\n")
@@ -71,10 +71,10 @@ def startServer():
         # Else, set success response
         else:
             response = "SUCCESS: \"" + message + "\" belongs to \"" + response + "\""
-
-        # Check if response is over 255 bytes long
-        # ------------ FILL-----------------
-
+            # Check if response is over 255 bytes long
+            if (len(response) > 255):
+                response = "WARNING: Response message exceeded 255 bytes. Email found in database."
+        
         # Pack response into struct
         responseLength = len(response)
         structFormat = 'cB' + str(responseLength) + 's'
