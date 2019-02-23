@@ -4,6 +4,7 @@
 from socket import *
 from struct import *
 import sys
+import csv
 
 # Create and start the server for the application
 def startServer():
@@ -67,12 +68,12 @@ def startServer():
         # Set error response if email is invalid
         if (response == -1):
             response = "ERROR: Invalid email address entered."
-        # Set error response if name could not be found
-        elif (response == 0):
-            response = "ERROR: Name could not be found in the database."
         # Else, set success response
         else:
             response = "SUCCESS: \"" + message + "\" belongs to \"" + response + "\""
+
+        # Check if response is over 255 bytes long
+        # ------------ FILL-----------------
 
         # Pack response into struct
         responseLength = len(response)
@@ -91,11 +92,12 @@ def startServer():
 
 # Method to return the full name of an associated email address
 def findName(message):
-    if (message == "a"):
+    with open('database.csv') as databaseCSV:
+        csvReader = csv.reader(databaseCSV, delimiter=",")
+        for row in csvReader:
+            messageLower = message.lower()
+            if (messageLower == row[0]):
+                return str(row[1])
         return -1
-    elif (message == "b"):
-        return 0
-    else:
-        return "Daniel Garcia"
 
 startServer()
