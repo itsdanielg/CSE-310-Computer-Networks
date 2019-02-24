@@ -53,7 +53,11 @@ def startClient():
         messageStruct = pack(structFormat, messageType, len(message), messageBytes)
 
         # Encode user input and send to server
-        clientSocket.send(messageStruct)
+        try:
+            clientSocket.send(messageStruct)
+        except ConnectionResetError:
+            print("Server has shutdown. Application will now close.")
+            break
 
         # Wait for server response and store in dataReceived variable
         dataReceived = clientSocket.recv(257)

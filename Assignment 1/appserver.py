@@ -3,6 +3,7 @@
 
 from socket import *
 from struct import *
+from _thread import *
 import sys
 import csv
 
@@ -30,22 +31,34 @@ def startServer():
 
     # Start listening for connections
     serverSocket.listen(1)
-    print("SUCCESS: Server created! Now listening for connections...")
-
-    # Send message to client once client connects; Exit server if sending fails
-    try:
-        connectionSocket, connectionAddress = serverSocket.accept()
-        print("SUCCESS: Connected to", connectionAddress, "\n")
-        connectionSocket.send(str.encode("SUCCESS: Connected to server!"))
-    except error:
-        print("ERROR: Server socket failed to connect with host and port.")
-        sys.exit(0)
+    print("SUCCESS: Server created! Now listening for connections...\n")
 
     # Set up infinite loop to send/receive requests
     while True:
 
-        # Wait for client request (Formatted as struct)
-        dataReceived = connectionSocket.recv(257)
+        # Send message to client once client connects; Exit server if sending fails
+        try:
+            connectionSocket, connectionAddress = serverSocket.accept()
+            print("SUCCESS: Connected to", connectionAddress, "\n")
+            connectionSocket.send(str.encode("SUCCESS: Connected to server!"))
+        except error:
+            print("ERROR: Server socket failed to connect with host and port.")
+            sys.exit(0)
+        
+        # Start new thread when new client is connected
+        thread = start_new_thread(clientThread, (connectionSocket, connectionAddress))
+
+def clientThread(connectionSocket, connectionAddress):
+
+    while True:
+
+    # Wait for client request (Formatted as struct)
+        try:
+            dataReceived = connectionSocket.recv(257)
+            if (dataReceived == b''):
+                break
+        except ConnectionResetError:
+            break
 
         # Unpack struct into tuple
         messageLength = dataReceived[1]
@@ -87,8 +100,12 @@ def startServer():
         print("Data Sent:")
         print("Message Type:", responseType.decode("utf-8"))
         print("Message Length:", responseLength)
-        print("Message:", response, "\n")
-        print("-------------------------------------------------------")
+        print("Message:", response)
+        print("-------------------------------------------------------\n")
+
+    # Close socket when thread ends
+    print("SUCCESS: Connection", connectionAddress, "has closed.\n")
+    connectionSocket.close()
 
 # Method to return the full name of an associated email address
 def findName(message):
