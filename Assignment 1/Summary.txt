@@ -1,0 +1,15 @@
+Daniel Garcia
+ID: 111157499
+
+My application currently uses two files, appclient.py and appserver.py for the client-server model, as well as database.csv file to mimic the database of the emails and names.
+
+To get started, appserver.py must be started first in order to initialize the server. If an appclient.py is opened, it will not connect to the server until the server has initialized.
+
+SERVER:
+Once initialized, the server will create a socket and bind this socket to host 127.0.0.1 and port 8887. The server will then start listening for connections, and once a client is started, a new thread is created to handle this client. Inside this thread, the server will wait for an email address, which is packed inside a struct, to be received from the client. Once received, the server will unpack the message, and invoke the findName() function to search the .csv database for an email that corresponds with the email requested. If the function finds the email in the database, it will then return the full name associated with that email. Otherwise it will return -1. If the server gets a -1, it will then send a response message packed in a struct that tells the client that an invalid email address was entered. Else, it will send a response message packed in a struct that contains the email requested and full name found.
+This server runs indefinitely until the actual appserver.py file is closed, therefore closing the socket and shutting down the server.
+
+CLIENT:
+Once initialized, it will wait for the server to start before it connects. If the server has already started, the client will automatically connect to the server at host 127.0.0.1 and port 8887. Once connected, the client will then ask the user for a valid email address. The client will then pack this request in a struct and send it to the server, to which the client waits until the server has given a response. When a response has been received, the client will unpack this struct, and print the response message onto the terminal. Afterwards, it will ask the user again for another input.
+If the user input entered is "q" or the client is closed, the client socket will close, and a message will show on the server stating that this client has closed.
+If the user inputs a request while the server is closed, the client will recognize this, and will close its own client socket.
