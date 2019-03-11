@@ -8,6 +8,9 @@ import sys
 import time
 import datetime
 
+# Set DNS Server to check (Currenty set to a.root-servers.net)
+rootServer = "198.41.0.4"
+
 def main():
 
     # Output to a separate file
@@ -15,9 +18,6 @@ def main():
 
     # Create list for list of domains to check
     domainList = []
-
-    # Set DNS Server to check (Currenty set to a.root-servers.net)
-    rootServer = "198.41.0.4"
 
     # Check if no domains are entered in the command line
     if len(sys.argv) < 2:
@@ -71,7 +71,7 @@ def main():
         # Output the answer length
         print("MSG SIZE rcvd:", length, "\n")
 
-# Function to do a DNS lookup for each server
+# Recursive function to do a DNS lookup for each server
 def myDig(dnsRequest, dnsServer, dnsAnswerList):
 
     # Get the UDP response for this server
@@ -94,8 +94,23 @@ def myDig(dnsRequest, dnsServer, dnsAnswerList):
             ip = str(answer[0])
             myDig(dnsRequest, ip, dnsAnswerList)
 
-    # Iterate through Authority Responses
+    # Return the function if there are answers
+    if len(dnsAnswerList) != 0:
+        return
 
-# print(dnsResponse.Start program
+    # Otherwise, iterate through authority Responses
+    for answer in dnsResponse.authority:
+        strAnswer = str(answer.to_text())
+        if (strAnswer.find("IN NS") != -1):
+            hostname = str(answer[0])
+            NSList = []
+            domainName = dns.name.from_text(hostname)
+            newRequest = dns.message.make_query(domainName, dns.rdatatype.A)
+            myDig(newRequest, rootServer, NSList)
+            for nsAnswer in NSList:
+                if (nsAnswer.find("IN A") != -1):
+                    ip = nsAnswer[nsAnswer.find("IN A") + 5:]
+                    myDig(dnsRequest, ip, dnsAnswerList)
+
+# Start program
 main()
-
