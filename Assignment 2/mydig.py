@@ -14,7 +14,7 @@ rootServer = "198.41.0.4"
 def main():
 
     # Output to a separate file
-    sys.stdout = open('“mydig_output.txt', 'w')
+    sys.stdout = open('mydig_output.txt', 'w')
 
     # Create list for list of domains to check
     domainList = []
@@ -75,7 +75,7 @@ def main():
 def myDig(dnsRequest, dnsServer, dnsAnswerList):
 
     # Get the UDP response for this server
-    dnsResponse = dns.query.udp(dnsRequest, dnsServer, timeout=10)
+    dnsResponse = dns.query.udp(dnsRequest, dnsServer, timeout=60)
     for answer in dnsResponse.answer:
         strAnswer = str(answer.to_text())
         allAnswers = strAnswer.split("\n")
