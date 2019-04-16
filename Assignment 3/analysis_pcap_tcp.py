@@ -22,36 +22,30 @@ def main():
     sender = '130.245.145.12'
     receiver = '128.208.2.198'
 
-    # Variables
     sourcePorts = []
     tcpFlows = []
-    senderPackets = 0
-    flowsFromSender = 0
-
+    
     # Iterate through each packet in the PCAP file
     for ts, buf in pcap:
-
         # Parse the bytes into an Ethernet object
         eth = dpkt.ethernet.Ethernet(buf)
-
         # Check if this is an IP packet
         if eth.type != dpkt.ethernet.ETH_TYPE_IP:
             continue
         ip = eth.data
-        
         # Check if this is a TCP packet
         if ip.p != dpkt.ip.IP_PROTO_TCP:
             continue
         tcp = ip.data
-
         sourcePort = tcp.sport
         destinationPort = tcp.dport
-        # Check
+        # Check if packet is from sender
         if sourcePort != 80:
+            # Append source port and new TCP Flow
             if sourcePort not in sourcePorts:
                 sourcePorts.append(sourcePort)
                 tcpFlows.append([])
-        sourceIndex = 0
+        # Append packet to corresponding TCP Flow
         if sourcePort in sourcePorts:
             sourceIndex = sourcePorts.index(sourcePort)
         elif destinationPort in sourcePorts:
@@ -59,6 +53,7 @@ def main():
         tcpFlows[sourceIndex].append([ts, buf])
 
     # Check how many flows are initiated from sender
+    flowsFromSender = 0
     for i in range(len(tcpFlows)):
         buf = tcpFlows[i][0][1]
         eth = dpkt.ethernet.Ethernet(buf)
@@ -68,7 +63,6 @@ def main():
         sourceIP = socket.inet_ntoa(ip.src)
         if sourceIP == sender:
             flowsFromSender += 1
-
     print("TCP Flows initiated from the sender:", flowsFromSender)
 
     # Iterate through each packet in each flow from sender
@@ -79,14 +73,13 @@ def main():
         transactions = []
         transactionIndex = 0
         startTime = 0
-        endTime = 0
         flowTime = 0
         totalFlowSize = 0
         packetsSent = 0
         packetsReceived = 0
-
+        # Print flow number and its source port
         print("\nFlow #" + str(i+1) +  ": Source Port =", sourcePorts[i])
-
+        # Iterate through each packet in this flow
         for packet in range(len(tcpFlows[i])):
             ts = tcpFlows[i][packet][0]
             buf = tcpFlows[i][packet][1]
@@ -95,69 +88,88 @@ def main():
             tcp = ip.data
             sourceIP = socket.inet_ntoa(ip.src)
 
+            # Get the flow time once it reaches the last packet
             if packetIndex == len(tcpFlows[i]) - 1:
-                endTime = ts
-                flowTime = endTime - startTime
+                flowTime = ts - startTime
 
+            # If this is the first packet (SYN), get startTime
             if packetIndex == 0:
                 startTime = ts
+                # If this first packet is from the sender, get appropriate sequence number
                 if sourceIP == sender:
                     senderSynSequenceNumber = tcp.seq
                     windowSizeShiftCount = tcp.opts[len(tcp.opts) - 1]
-            
+
+            # Else if this is the SYN/ACK packet and from receiver, get appropriate sequence number
             elif packetIndex == 1:
                 if sourceIP == receiver:
                     receiverSynSequenceNumber = tcp.seq
-            
-            # Skip the 3-Way Handshake
+
+            # Else handle packets after the 3-Way handshake
             elif packetIndex > 2:
+
                 # Get sender packet length and append to total flow size
                 if sourceIP == sender:
                     totalFlowSize += len(buf)
+                    # If this packet is still before FIN, increment packets sent
                     if packetIndex < len(tcpFlows[i]) - 3:
                         packetsSent += 1
                 else:
+                    # If this packet is still before FIN, increment packets received
                     if packetIndex < len(tcpFlows[i]) - 3:
                         packetsReceived += 1
+
                 # Ignore PSH, ACK packet in transactions
                 if not ((tcp.flags & dpkt.tcp.TH_PUSH) and (tcp.flags & dpkt.tcp.TH_ACK)):
+                    
                     # Get the window size of the packet
                     windowSize = tcp.win << windowSizeShiftCount
-                    # Get sequence and ack number of packet
+                    
+                    # Sender to receiver packet
                     if tcp.sport != 80:
-                        # Sender to receiver packet
+                        # Get sequence and ack number of packet,and package packet
                         sequenceNumber = abs(tcp.seq - senderSynSequenceNumber)
                         ackNumber = abs(tcp.ack - receiverSynSequenceNumber)
-                        if len(transactions) < 2:
-                            transactions.append([])
                         packet = [tcp.sport, tcp.dport, tcp.flags, sequenceNumber, ackNumber, windowSize]
+                        # Add a new transaction (Only worry about the first 5 transactions)
+                        if len(transactions) < 5:
+                            transactions.append([])
+                        # Add this packet in all unfinished transactions
                         for j in range(transactionIndex, len(transactions)):
                             transactions[j].append(packet)
-                        
+
+                    # Receiver to sender packet
                     else:
-                        # Receiver to sender packet
+                        # Get sequence and ack number of packet, and package packet
                         sequenceNumber = abs(tcp.seq - receiverSynSequenceNumber)
                         ackNumber = abs(tcp.ack - senderSynSequenceNumber)
                         packet = [tcp.sport, tcp.dport, tcp.flags, sequenceNumber, ackNumber, windowSize]
+                        # End transactions that are fulfilled by the received packet
                         for j in range(transactionIndex, len(transactions)):
                             senderSeq = transactions[j][0][3]
                             if ackNumber == senderSeq:
                                 transactions[j].append(packet)
                                 transactionIndex += 1
                                 break
-                    
+            
+            # Increment index packet
             packetIndex += 1
         
+        # Calculate throughput, packets not received, and loss rate
         throughput = totalFlowSize/flowTime
         packetsNotReceived = packetsSent - packetsReceived
         lossRate = packetsNotReceived/packetsSent
+
+        # Print summary for each flow
         print("Total Time =", float("{0:.4f}".format(flowTime)), "seconds")
         print("Sender Throughput:", float("{0:.2f}".format(throughput)), "B/s =", float("{0:.2f}".format(throughput/1000)), "kB/s =", float("{0:.2f}".format(throughput/1000000)), "MB/s")
         print("Packets Sent:", packetsSent)
         print("Packets Received:", packetsReceived)
         print("LossRate:", str(float("{0:.2f}".format(lossRate*100))) + "%")
         
+        # Print summary for all transactions
         for j in range(len(transactions)):
+            # Only worry about the first two transactions
             if j == 2:
                 break
             print("Transaction #" + str(j+1) + ":")
@@ -172,6 +184,8 @@ def main():
             print("\t\tAck Number:", packetReceived[4])
             print("\t\tReceive Window Size:", packetReceived[5])
 
+    # Close the PCAP file
     pcapFile.close()
 
+# Run the program
 main()

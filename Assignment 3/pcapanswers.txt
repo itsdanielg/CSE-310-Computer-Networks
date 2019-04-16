@@ -1,0 +1,15 @@
+Daniel Garcia
+ID: 111157499
+
+1) There are a total of 3 TCP flows initated from the sender
+
+2a) The sequence number of a packet is a number relative to the SYN packet's  sequence number that identifies the first byte sent by that packet. The ackowledgement number of a packet is a number also relative to the SYN packet's sequence number that indicates which packet's sequence number it is responding to. Therefore, if a packet with a sequence number of 25 is sent, a packet with an ack number of 25 will be received in response.
+
+The receive window size is a value that indicates how much data that the sender of the packet can receive in response. Therefore, if the sender packet's receive window size is 49152, it can receive up to 49152 bytes of data in response from the receiver.
+
+2b) The throughput is included in the summary for each flow.
+
+2c) The loss rate is included in the summary for each flow.
+
+HOW TO RUN THE PROGRAM:
+Run analysis_pcap_tcp.py and a high-level summary text file will be created within the same directory.
