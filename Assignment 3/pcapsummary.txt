@@ -1,0 +1,76 @@
+TCP Flows initiated from the sender: 3
+
+Flow #1: Source Port = 43498
+Total Time = 2.0104 seconds
+Sender Throughput: 5251321.48 B/s = 5251.32 kB/s = 5.25 MB/s
+Packets Sent: 6974
+Packets Received: 4126
+LossRate: 40.84%
+Transaction #1:
+	Packet Sent:
+		Sequence Number: 25
+		Ack Number: 1
+		Receive Window Size: 49152
+	Packet Received:
+		Sequence Number: 1
+		Ack Number: 25
+		Receive Window Size: 49152
+Transaction #2:
+	Packet Sent:
+		Sequence Number: 1473
+		Ack Number: 1
+		Receive Window Size: 49152
+	Packet Received:
+		Sequence Number: 1
+		Ack Number: 1473
+		Receive Window Size: 49152
+
+Flow #2: Source Port = 43500
+Total Time = 8.3204 seconds
+Sender Throughput: 1285403.9 B/s = 1285.4 kB/s = 1.29 MB/s
+Packets Sent: 7065
+Packets Received: 4763
+LossRate: 32.58%
+Transaction #1:
+	Packet Sent:
+		Sequence Number: 25
+		Ack Number: 1
+		Receive Window Size: 49152
+	Packet Received:
+		Sequence Number: 1
+		Ack Number: 25
+		Receive Window Size: 49152
+Transaction #2:
+	Packet Sent:
+		Sequence Number: 1473
+		Ack Number: 1
+		Receive Window Size: 49152
+	Packet Received:
+		Sequence Number: 1
+		Ack Number: 1473
+		Receive Window Size: 49152
+
+Flow #3: Source Port = 43502
+Total Time = 0.7403 seconds
+Sender Throughput: 1481317.27 B/s = 1481.32 kB/s = 1.48 MB/s
+Packets Sent: 726
+Packets Received: 453
+LossRate: 37.6%
+Transaction #1:
+	Packet Sent:
+		Sequence Number: 25
+		Ack Number: 1
+		Receive Window Size: 49152
+	Packet Received:
+		Sequence Number: 1
+		Ack Number: 25
+		Receive Window Size: 49152
+Transaction #2:
+	Packet Sent:
+		Sequence Number: 1473
+		Ack Number: 1
+		Receive Window Size: 49152
+	Packet Received:
+		Sequence Number: 1
+		Ack Number: 1473
+		Receive Window Size: 49152
