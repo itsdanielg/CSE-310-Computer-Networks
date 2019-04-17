@@ -77,6 +77,13 @@ def main():
         totalFlowSize = 0
         packetsSent = 0
         packetsReceived = 0
+        prev1Packet = 0
+        prev2Packet = 0
+        prev3Packet = 0
+        prevSenderSeq = 0
+        tripleDupAckRT = 0
+        timeoutRT = 0
+
         # Print flow number and its source port
         print("\nFlow #" + str(i+1) +  ": Source Port =", sourcePorts[i])
         # Iterate through each packet in this flow
@@ -98,6 +105,7 @@ def main():
                 # If this first packet is from the sender, get appropriate sequence number
                 if sourceIP == sender:
                     senderSynSequenceNumber = tcp.seq
+                    prevSenderSeq = tcp.seq
                     windowSizeShiftCount = tcp.opts[len(tcp.opts) - 1]
 
             # Else if this is the SYN/ACK packet and from receiver, get appropriate sequence number
@@ -130,20 +138,29 @@ def main():
                         # Get sequence and ack number of packet,and package packet
                         sequenceNumber = abs(tcp.seq - senderSynSequenceNumber)
                         ackNumber = abs(tcp.ack - receiverSynSequenceNumber)
-                        packet = [tcp.sport, tcp.dport, tcp.flags, sequenceNumber, ackNumber, windowSize]
+                        packet = [tcp.sport, tcp.dport, tcp.flags, sequenceNumber, ackNumber, windowSize, ts, len(buf)]
                         # Add a new transaction (Only worry about the first 5 transactions)
                         if len(transactions) < 5:
                             transactions.append([])
                         # Add this packet in all unfinished transactions
                         for j in range(transactionIndex, len(transactions)):
                             transactions[j].append(packet)
+                        # Check if packet was retransmitted
+                        if packetIndex > 6:
+                            if sequenceNumber < prevSenderSeq:
+                                # Check if retransmission was caused by three duplicate ACKS
+                                if prev3Packet[4] == prev2Packet[4] == prev1Packet[4]:
+                                    tripleDupAckRT += 1
+                                else:
+                                    timeoutRT += 1
+                            prevSenderSeq = sequenceNumber
 
                     # Receiver to sender packet
                     else:
                         # Get sequence and ack number of packet, and package packet
                         sequenceNumber = abs(tcp.seq - receiverSynSequenceNumber)
                         ackNumber = abs(tcp.ack - senderSynSequenceNumber)
-                        packet = [tcp.sport, tcp.dport, tcp.flags, sequenceNumber, ackNumber, windowSize]
+                        packet = [tcp.sport, tcp.dport, tcp.flags, sequenceNumber, ackNumber, windowSize, ts, len(buf)]
                         # End transactions that are fulfilled by the received packet
                         for j in range(transactionIndex, len(transactions)):
                             senderSeq = transactions[j][0][3]
@@ -151,6 +168,13 @@ def main():
                                 transactions[j].append(packet)
                                 transactionIndex += 1
                                 break
+
+                    # Record previous packets (For checking triple duplicate ACKS)
+                    
+                    prev3Packet = prev2Packet
+                    prev2Packet = prev1Packet
+                    prev1Packet = packet
+                    
             
             # Increment index packet
             packetIndex += 1
@@ -170,19 +194,37 @@ def main():
         # Print summary for all transactions
         for j in range(len(transactions)):
             # Only worry about the first two transactions
-            if j == 2:
-                break
-            print("Transaction #" + str(j+1) + ":")
-            packetSent = transactions[j][0]
-            packetReceived = transactions[j][len(transactions[j])-1]
-            print("\tPacket Sent:")
-            print("\t\tSequence Number:", packetSent[3])
-            print("\t\tAck Number:", packetSent[4])
-            print("\t\tReceive Window Size:", packetSent[5])
-            print("\tPacket Received:")
-            print("\t\tSequence Number:", packetReceived[3])
-            print("\t\tAck Number:", packetReceived[4])
-            print("\t\tReceive Window Size:", packetReceived[5])
+            if j < 2:
+                print("Transaction #" + str(j+1) + ":")
+                packetSent = transactions[j][0]
+                packetReceived = transactions[j][len(transactions[j])-1]
+                print("\tPacket Sent:")
+                print("\t\tSequence Number:", packetSent[3])
+                print("\t\tAck Number:", packetSent[4])
+                print("\t\tReceive Window Size:", packetSent[5])
+                print("\tPacket Received:")
+                print("\t\tSequence Number:", packetReceived[3])
+                print("\t\tAck Number:", packetReceived[4])
+                print("\t\tReceive Window Size:", packetReceived[5])
+
+        # PART B
+        print("First Five Congestion Window Sizes:")
+        for j in range(len(transactions)):
+            if j < 5:
+                packetSent = transactions[j][0]
+                packetReceived = transactions[j][len(transactions[j])-1]
+                rtt =  packetReceived[6] - packetSent[6]
+                totalPackets = len(transactions[j])
+                totalBytes = 0
+                for k in range(totalPackets):
+                    totalBytes += transactions[j][k][7]
+                print("\tRTT #" + str(j+1) + ":", float("{0:.4f}".format(rtt)), "seconds")
+                print("\t\tTotal Packets in cwnd:", totalPackets)
+                print("\t\tTotal Bytes in cwnd:", totalBytes, "B =", float("{0:.2f}".format(totalBytes/1000)), "kB")
+        
+        print("Total Number of Retransmissions:")
+        print("\tDue to Triple Duplicate Ack:", tripleDupAckRT)
+        print("\tDue to Timeout:", timeoutRT)
 
     # Close the PCAP file
     pcapFile.close()

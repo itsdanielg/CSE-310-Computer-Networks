@@ -24,6 +24,25 @@ Transaction #2:
 		Sequence Number: 1
 		Ack Number: 1473
 		Receive Window Size: 49152
+First Five Congestion Window Sizes:
+	RTT #1: 0.0724 seconds
+		Total Packets in cwnd: 10
+		Total Bytes in cwnd: 13692 B = 13.69 kB
+	RTT #2: 0.0726 seconds
+		Total Packets in cwnd: 11
+		Total Bytes in cwnd: 15206 B = 15.21 kB
+	RTT #3: 0.0725 seconds
+		Total Packets in cwnd: 12
+		Total Bytes in cwnd: 16720 B = 16.72 kB
+	RTT #4: 0.0733 seconds
+		Total Packets in cwnd: 13
+		Total Bytes in cwnd: 18234 B = 18.23 kB
+	RTT #5: 0.0732 seconds
+		Total Packets in cwnd: 13
+		Total Bytes in cwnd: 18234 B = 18.23 kB
+Total Number of Retransmissions:
+	Due to Triple Duplicate Ack: 3
+	Due to Timeout: 0
 
 Flow #2: Source Port = 43500
 Total Time = 8.3204 seconds
@@ -49,6 +68,25 @@ Transaction #2:
 		Sequence Number: 1
 		Ack Number: 1473
 		Receive Window Size: 49152
+First Five Congestion Window Sizes:
+	RTT #1: 0.0731 seconds
+		Total Packets in cwnd: 10
+		Total Bytes in cwnd: 13692 B = 13.69 kB
+	RTT #2: 0.0731 seconds
+		Total Packets in cwnd: 11
+		Total Bytes in cwnd: 15206 B = 15.21 kB
+	RTT #3: 0.073 seconds
+		Total Packets in cwnd: 10
+		Total Bytes in cwnd: 13692 B = 13.69 kB
+	RTT #4: 0.0734 seconds
+		Total Packets in cwnd: 13
+		Total Bytes in cwnd: 18234 B = 18.23 kB
+	RTT #5: 0.0733 seconds
+		Total Packets in cwnd: 13
+		Total Bytes in cwnd: 18234 B = 18.23 kB
+Total Number of Retransmissions:
+	Due to Triple Duplicate Ack: 3
+	Due to Timeout: 81
 
 Flow #3: Source Port = 43502
 Total Time = 0.7403 seconds
@@ -74,3 +112,22 @@ Transaction #2:
 		Sequence Number: 1
 		Ack Number: 1473
 		Receive Window Size: 49152
+First Five Congestion Window Sizes:
+	RTT #1: 0.0729 seconds
+		Total Packets in cwnd: 10
+		Total Bytes in cwnd: 13692 B = 13.69 kB
+	RTT #2: 0.0729 seconds
+		Total Packets in cwnd: 11
+		Total Bytes in cwnd: 15206 B = 15.21 kB
+	RTT #3: 0.0729 seconds
+		Total Packets in cwnd: 10
+		Total Bytes in cwnd: 13692 B = 13.69 kB
+	RTT #4: 0.0729 seconds
+		Total Packets in cwnd: 9
+		Total Bytes in cwnd: 12178 B = 12.18 kB
+	RTT #5: 0.0728 seconds
+		Total Packets in cwnd: 8
+		Total Bytes in cwnd: 10664 B = 10.66 kB
+Total Number of Retransmissions:
+	Due to Triple Duplicate Ack: 1
+	Due to Timeout: 0
