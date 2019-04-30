@@ -1,0 +1,9 @@
+Daniel Garcia
+ID: 111157499
+
+ii) Based on the ARP messages from my PCAP file, the IP and MAC address of my router is 172.24.91.89 and a4:34:d9:38:35:3d respectively. I determined these because it is a reply packet and its IP address is the same as the one connected to my mobile device.
+
+README:
+To run this program, edit the PCAP file that will be read by changing the fileName variable in analysis_pcap_arp.py and then run using python. The output of the program will be saved in pcapsumamry.txt within the same directory of the python script.
+
+This program was made by reading the PCAP file in byte format using dpkt.Reader and then parsing through each byte individually to fill out the respective fields. The fields were then compared with the summary in wireshark to make sure that each field was correct.
