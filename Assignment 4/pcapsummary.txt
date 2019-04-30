@@ -1,27 +1,27 @@
 ---------- One ARP Packet Exchange ----------
 
-Packet Number: 45 (ARP)
-Ethernet Source Address: 20:c0:47:51:f2:b7
-Ethernet Destination Address: 60:30:d4:69:44:c0
+Packet Number: 24163 (ARP)
+Ethernet Source Address: 0:1a:1e:0:30:80
+Ethernet Destination Address: a4:34:d9:38:35:3d
 Hardware Type: Ethernet (1)
 Protocol Type: IPv4 (0x0800)
 Hardware Size: 6
 Protocol Size: 4
 Opcode: ARP Request (1)
-Sender MAC Address: 20:c0:47:51:f2:b7
-Sender IP Address: 192.168.1.1
-Target MAC Address: 60:30:d4:69:44:c0
-Target IP Addresss: 192.168.1.168
+Sender MAC Address: 0:1a:1e:0:30:80
+Sender IP Address: 0.0.0.0
+Target MAC Address: 0:0:0:0:0:0
+Target IP Addresss: 172.24.91.89
 
-Packet Number: 46 (ARP)
-Ethernet Source Address: 60:30:d4:69:44:c0
-Ethernet Destination Address: 20:c0:47:51:f2:b7
+Packet Number: 24164 (ARP)
+Ethernet Source Address: a4:34:d9:38:35:3d
+Ethernet Destination Address: 0:1a:1e:0:30:80
 Hardware Type: Ethernet (1)
 Protocol Type: IPv4 (0x0800)
 Hardware Size: 6
 Protocol Size: 4
 Opcode: ARP Reply (2)
-Sender MAC Address: 60:30:d4:69:44:c0
-Sender IP Address: 192.168.1.168
-Target MAC Address: 20:c0:47:51:f2:b7
-Target IP Addresss: 192.168.1.1
+Sender MAC Address: a4:34:d9:38:35:3d
+Sender IP Address: 172.24.91.89
+Target MAC Address: 0:1a:1e:0:30:80
+Target IP Addresss: 0.0.0.0

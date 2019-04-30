@@ -5,7 +5,7 @@ import dpkt
 import sys
 
 # Name of PCAP file to be parsed through
-fileName = 'assignment4_example.pcap'
+fileName = 'assignment4_my_arp.pcap'
 
 # Boolean to check only ONE ARP exchange
 packetRequest = False
@@ -25,10 +25,6 @@ def main():
     # Iterate through each packet in the PCAP file
     packetCounter = 1
     for ts, buf in pcap:
-
-        # Check if there's already been one ARP packet exchange
-        if packetRequest and packetReply:
-            break
 
         # Check if this packet is an ARP packet
         packetType = buf[12:14]
@@ -115,19 +111,24 @@ def main():
                 counter += 1
 
             # Print all information
-            print("")
-            print("Packet Number:", packetCounter, "(ARP)")
-            print("Ethernet Source Address:", sourceAddress)
-            print("Ethernet Destination Address:", destinationAddress)
-            print("Hardware Type:", hardwareType)
-            print("Protocol Type:", protocolType)
-            print("Hardware Size:", hardwareSize)
-            print("Protocol Size:", protocolSize)
-            print("Opcode:", opcode)
-            print("Sender MAC Address:", senderMACAddress)
-            print("Sender IP Address:", senderIPAddress)
-            print("Target MAC Address:", targetMACAddress)
-            print("Target IP Addresss:", targetIPAddress)
+            
+            # Stop printing if there's already been one ARP packet exchange
+            if packetRequest and packetReply:
+                continue
+            else:
+                print("")
+                print("Packet Number:", packetCounter, "(ARP)")
+                print("Ethernet Source Address:", sourceAddress)
+                print("Ethernet Destination Address:", destinationAddress)
+                print("Hardware Type:", hardwareType)
+                print("Protocol Type:", protocolType)
+                print("Hardware Size:", hardwareSize)
+                print("Protocol Size:", protocolSize)
+                print("Opcode:", opcode)
+                print("Sender MAC Address:", senderMACAddress)
+                print("Sender IP Address:", senderIPAddress)
+                print("Target MAC Address:", targetMACAddress)
+                print("Target IP Addresss:", targetIPAddress)
 
         packetCounter += 1
 
